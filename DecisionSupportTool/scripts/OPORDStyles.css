@@ -1,0 +1,99 @@
+h2 {
+    font-family: Roboto, Arial; 
+    color: #333333;
+    font-size: 28px;
+    padding: 0px;
+    margin: 0px;
+}
+.lex {border: 1px solid #bfbfbf;}
+.person {background-color: #CCFF66;}
+.organization {background-color: #99CCFF;}
+.location {background-color: #FF99CC;}
+.date {background-color: #F0E442;}
+.coordinate {background-color: #E69F00;}
+.target {background-color: #D46DF5 /*#9975B9*/;}
+.person:hover, .organization:hover, .location:hover, .date:hover,
+.coordinate:hover, .target:hover
+{
+    border-style: inset;
+    color: white;
+    background-color: black;
+}
+#OPORDTextDemo {
+    overflow-y:auto;
+    height: 500px;
+    width: 510px;
+    position: absolute;
+    top: 100px;
+    left: 516px;
+    background-color: white;
+    font-family: Times New Roman;
+    border-style: outset;
+}
+#OPORD_selectorDiv {
+    position: relative;
+    float: right;
+    font-size: 18px;
+    color: #333333;
+    top: 0px;
+}
+#UAV_selectorDiv {
+    position: absolute;
+    float: left;
+    top: 610px;
+    left: 8px;
+    font-size: 18px;
+    color: #333333;
+}
+#OPORDMapDemo {
+    height: 500px;
+    width: 500px;
+    top: 100px;
+    left: 8px;
+    position: absolute;
+    border-style: outset;
+}
+#controls {
+    position: absolute;
+    top: 610px;
+    left: 516px;
+    font-size: 18px;
+    color: #333333;
+}
+html, body, #map {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Roboto, Arial;
+}
+body {
+    background-color: #F7F7F7;
+}
+.stations, .stations svg {
+  position: absolute;
+}
+.stations svg {
+  width: 60px;
+  height: 20px;
+  padding-right: 100px;
+  font-size: 14px;
+}
+#wrapper {
+    background: #F7F7F7;
+    width: 1020px;
+    height: 690px;
+    text-align: left;
+    margin-left: 0; margin-right: 0;
+    padding: 8px;
+    position: relative;
+}
+.checkbox input {
+    vertical-align: bottom;
+}
+#credit {
+    position: absolute;
+    top: 690px;
+    left: 650px;
+    font-size: 12px;
+}
