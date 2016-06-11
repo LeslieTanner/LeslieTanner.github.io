@@ -136,6 +136,29 @@
             };
             console.log(vals); 
 
+            // Redraw Map Here:
+            // setup some options
+            var mapCenterLatLong = new google.maps.LatLng(41.351641, -73.977758);
+
+            var mapOptions = {
+                center: mapCenterLatLong,
+                zoom: 12,
+                mapTypeId: google.maps.MapTypeId.TERRAIN
+                };
+
+            // create the map, in the DIV defined, using the options set just above.
+            map = new google.maps.Map(document.getElementById("OPORDMapDemo"), mapOptions);
+            infowindow = new google.maps.InfoWindow({content: "waiting for content..."});
+
+            var styles = [
+                {stylers: [{lightness: "50"}]}
+            ];  // These styles are created with Google Style Wizard
+            map.setOptions({styles: styles});
+
+            // create the markers
+            key = +document.getElementById('OPORD_selector').value
+            getData();
+            
             for (var i=0, n=vals.length;i<n;i++) {
                 var drone = vals[i];
                 if (drone != null) {
