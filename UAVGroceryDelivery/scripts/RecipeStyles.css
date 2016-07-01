@@ -1,0 +1,170 @@
+#RecipeText {
+    overflow-y:auto;
+    height: 400px;
+    width: 410px;
+    position: absolute;
+    top: 100px;
+    left: 8px;
+    background-color: white;
+    font-family: Times New Roman;
+    border-style: outset;
+    border-radius: 8px;
+}
+#Recipe_selectorDiv {
+    position: relative;
+    float: left;
+    font-size: 18px;
+    color: #2C2C2C;
+    top: 0px;
+}
+#RecipeMapDemo {
+    height: 500px;
+    width: 600px;
+    top: 100px;
+    left: 426px;
+    position: absolute;
+    border-style: outset;
+    border-radius: 8px;
+}
+html, body, #map {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Roboto, Arial;
+}
+body {
+    background-color: #EFF5F6;
+}
+.calculated {
+    background-color: #E4EAEA;
+}
+.calculated_weight {
+    background-color: #E4EAEA;
+    text-align: center;
+}
+.response {
+    height: 80px;
+    width: 100px;
+    background-color: transparent;
+    border: none;
+    font-size: 70px;
+    text-align: right;
+    color: #36A582;
+    font-family: "Jenna Sue";
+}
+#wrapper {
+    background:#EFF5F6;
+    width: 1020px;
+    height: 770px;
+    text-align: left;
+    margin-left: 0; margin-right: 0;
+    padding: 8px;
+    position: relative;
+}
+#times td {
+    width: 12em;
+}
+ul {list-style-type:circle;}
+.weight{color: #E35755;}
+#submit {
+    padding: 4px; 
+    color: white; background-color: #36A582; 
+    font-family: arial; 
+    border-style: outset; 
+    text-decoration: none;  
+    display: inline;
+    border-radius: 8px;
+}
+#submit:hover,
+#submit:active {
+    border-style: inset;
+    border-radius: 8px;
+    color: black;
+}
+#AddCartDiv {
+    position: absolute;
+    top: 70px;
+    left: 300px;
+}
+#AddCartDiv a, #EmptyCartDiv a, #Refresh a {
+    padding: 4px; 
+    color: white; background-color: #36A582; 
+    font-family: arial; 
+    border-style: outset; 
+    text-decoration: none;  
+    display: inline;
+    border-radius: 8px;
+}
+#AddCartDiv a:hover,
+#AddCartDiv a:active {
+    border-style: inset;
+    color: black;
+    border-radius: 8px;
+}
+#EmptyCartDiv a:hover,
+#EmptyCartDiv a:active {
+    border-style: inset;
+    color: black;
+    border-radius: 8px;
+}
+#EmptyCartDiv {
+    position: absolute;
+    top: 70px;
+    left: 939px;
+    border-radius: 8px;
+}
+#CartDiv {
+    position: absolute;
+    top: 60px;
+    left: 730px;
+    font-size: 18px;
+    color: #2C2C2C;
+}
+#Refresh a:hover,
+#Refresh a:active {
+    border-style: inset;
+    color: black;
+    border-radius: 8px;
+}
+#Refresh {
+    position: absolute;
+    top: 70px;
+    left: 426px;
+    border-radius: 8px;
+}
+#AddressBar {
+    position: relative;
+    top: 420px;
+    width: 410px;
+    color: #2C2C2C;
+}
+#result {
+    position: relative;
+    float: left;
+    top: 385px;
+}
+#logo {
+    position: absolute;
+    top: 650px;
+    left: 826px;
+    color: #36A582;
+}
+#credit {
+    position: absolute;
+    top: 780px;
+    left: 8px;
+    font-size: 12px;
+}
+input, select {
+    border-radius: 8px;
+}
+h2 {
+    font-family: "Jenna Sue"; 
+    color: #36A582;
+    font-size: 40px;
+    padding: 0px;
+    margin: 0px;
+}
+
+@font-face {font-family: Jenna Sue; src: url('JennaSue.ttf')}

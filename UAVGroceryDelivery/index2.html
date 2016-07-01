@@ -1,0 +1,380 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <title>Grocery Decision Support Tool</title>
+    
+    <link rel="stylesheet" type="text/css" href="scripts/RecipeStyles.css" />
+<!--    <link rel="stylesheet" href="FontAwesome/font-awesome-4.6.2/css/font-awesome.min.css" />-->
+
+    <!-- <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> -->
+    <script src="scripts/d3.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js"></script>
+    <script src="data/DroneRanges2.js"></script>
+    
+    <script type="text/javascript">
+
+    var map = "";           // create a map variable, with Global scope
+    var markersArray = [];  // create array to hold markers
+    var distanceArray = [];  // create array to hold distance calculations    
+    var data;
+    var amount = 0; 
+    var minDistance;
+    var key = "2";    
+    
+    function getData() {
+        d3.csv("data/RelayFoodsLocations.csv", function(d) { 
+            data = d;
+            data.forEach(function(d) {
+                setMarkers(d);
+            });
+            filterRecipe(key);
+        });
+    }
+        
+    function filterRecipe(key) {
+        if(key == "2") {
+            document.getElementById("RecipeText").src ="Recipes/AvocadoQuinoa.html";
+        } else if(key == "3.2") {
+            document.getElementById("RecipeText").src ="Recipes/BabyBack.html";
+        } else if(key == "10") {
+            document.getElementById("RecipeText").src ="Recipes/Cookies.html";
+        } else if(key == "5") {
+            document.getElementById("RecipeText").src ="Recipes/Manicotti.html";
+        } else if(key == "2.6") {
+            document.getElementById("RecipeText").src ="Recipes/Tilapia.html";
+        } else if(key == "15") {
+            document.getElementById("RecipeText").src ="Recipes/Turkey.html";
+        } else if(key == "4.2") {
+            document.getElementById("RecipeText").src ="Recipes/VeggiePasta.html";
+        } 
+    }
+
+    function initialize() {  
+        // setup some options
+        var mapCenterLatLong = new google.maps.LatLng(38.0312491, -78.4814009);
+
+        var mapOptions = {
+            center: mapCenterLatLong,
+            zoom: 13,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+        // create the map, in the DIV defined, using the options set just above.
+        map = new google.maps.Map(document.getElementById("RecipeMapDemo"), mapOptions);
+        infowindow = new google.maps.InfoWindow({content: "waiting for content..."});
+
+        var styles = [
+            {stylers: [{lightness: "50"}]}
+        ];  // These styles are created with Google Style Wizard
+        map.setOptions({styles: styles});
+            
+        // create the markers
+        key = +document.getElementById('Recipe_selector').value
+        getData();
+    }
+
+    function setMarkers(markerData) {
+        // define a single marker (a pin point on the map)
+        var myLatLong = new google.maps.LatLng(markerData["lat"],markerData["long"]);
+        var marker = new google.maps.Marker({
+            position: myLatLong,
+            map: map,
+            icon: "images/bunch-ingredients-24.png",
+            html: "<strong>" + markerData["Location name"] + "</strong>:<br />Address: " + 
+                markerData["Address"],
+            title: markerData["Location name"]
+            });
+
+        // add the marker to the array
+        markersArray.push(marker);
+        google.maps.event.addListener(marker, 'click', function () {
+            infowindow.setContent(this.html);
+            infowindow.open(map,this);
+        });
+    }
+        
+    function setRange(markerData) {        
+        // draw flying ranges
+        var myLatLong = new google.maps.LatLng(markerData["lat"], markerData["long"]);
+        vals = ["raven", "quadcopter", "pidgeon", "paperairplane"];
+        var weight = +document.getElementById('cart_weight').value;
+        
+        for (var i=0, n=vals.length;i<n;i++) {
+            var drone = vals[i];
+            if (weight < droneRanges[drone].maxload) {
+                var droneCircle = new google.maps.Circle({
+                    strokeColor: droneRanges[drone].strokeColor,
+                    strokeOpacity: 1,
+                    strokeWeight: 1,
+                    fill: droneRanges[drone].strokeFill,
+                    fillOpacity: 0,
+                    map: map,
+                    center: myLatLong,
+                    radius: (droneRanges[drone].range/2)
+                });
+            } else if (droneRanges[drone].maxload < 1) {
+                var droneCircle = new google.maps.Circle({
+                    strokeColor: droneRanges[drone].strokeColor,
+                    strokeOpacity: 1,
+                    strokeWeight: 1,
+                    fill: droneRanges[drone].strokeFill,
+                    fillOpacity: 0,
+                    map: map,
+                    center: myLatLong,
+                    radius: (droneRanges[drone].range/2) * droneRanges[drone].maxload/weight
+                });       
+            } else {
+                var droneCircle = new google.maps.Circle({
+                    strokeColor: droneRanges[drone].strokeColor,
+                    strokeOpacity: 1,
+                    strokeWeight: 1,
+                    fill: droneRanges[drone].strokeFill,
+                    fillOpacity: 0,
+                    map: map,
+                    center: myLatLong,
+                    radius: (droneRanges[drone].range/2) * droneRanges[drone].maxload/weight
+                }); 
+            }
+        }
+         
+        // Add marker icon on top of old one
+        var marker = new google.maps.Marker({
+            position: myLatLong,
+            map: map,
+            icon: "images/bunch-ingredients-24-red.png",
+            html: "<strong>" + markerData["Location name"] + "</strong>:<br />Address: " + markerData["Address"],
+            title: markerData["Location name"]
+        });
+
+        // add the marker to the array
+        markersArray.push(marker);
+        google.maps.event.addListener(marker, 'click', function () {
+            infowindow.setContent(this.html);
+            infowindow.open(map,this);
+        });
+    }
+    
+    function showAddress(latLng) {
+        initialize();
+        markerPosition = new google.maps.LatLng(latLng);
+        map.setCenter(latLng);
+        map.setZoom(13);
+        var marker = new google.maps.Marker({
+            map: map,
+            draggable:true,
+            position: latLng
+        });
+        
+        markersArray.push(marker);	//put marker into the array for later access.
+        google.maps.event.addListener(marker, 'dragend', function(evt) { 
+            document.getElementById('lat').value = evt.latLng.lat();
+            document.getElementById('long').value = evt.latLng.lng();
+        } );
+        
+        // put it into the form fields
+        document.getElementById('lat').value = latLng.lat();
+        document.getElementById('long').value = latLng.lng();
+        
+        // calculate and populate nearest field
+        distanceArray = [];     // Clear the array of previous distances
+        d3.csv("data/RelayFoodsLocations.csv", function(d) {
+            data = d;
+            data.forEach(function(d) {
+                getDistance(d);
+            });
+            
+            // Index of nearest location
+            var idx = distanceArray.indexOf(Math.min.apply(null, distanceArray));
+
+            // put into form field for nearest location
+            document.getElementById('nearest').value = data[idx]["Location name"];
+            
+            // coordinates of nearest location
+            var newLat = data[idx].lat;
+            var newLong = data[idx].long;
+            
+            // calculate euclidean distance from source to target
+            minDistance = measure(newLat, newLong, document.getElementById('lat').value, document.getElementById('long').value); //euclidean distance
+            
+            // Populate boxes on bottom, based on weight only
+            var weight = +document.getElementById('cart_weight').value;
+            
+            document.getElementById('drone_total').value = Math.ceil(weight/droneRanges["raven"].maxload);
+            document.getElementById('quad_total').value = Math.ceil(weight/droneRanges["quadcopter"].maxload);
+            document.getElementById('bird_total').value = Math.ceil(weight/droneRanges["pidgeon"].maxload);
+            document.getElementById('paper_total').value = Math.ceil(weight/droneRanges["paperairplane"].maxload);
+            
+            // Draw Ranges (as markers)
+            setRange(data[idx]);
+        });                
+    }
+    
+    function measure(lat1, lon1, lat2, lon2){  // generally used geo measurement function - stackoverflow
+        var R = 6378.137; // Radius of earth in KM
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLon = (lon2 - lon1) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c;
+        return d * 1000; // meters
+    }    
+    function getLatLng(address, myCallback){
+        geocoder = new google.maps.Geocoder();
+        var latLng = '';
+        geocoder.geocode({
+            'address': address
+        }, 
+        function(results, status){
+            if (status == google.maps.GeocoderStatus.OK && results.length) {
+                latLng = results[0].geometry.location;
+                if(myCallback){
+                    myCallback(latLng);
+                }
+            }
+        });
+    }
+    
+    function getDistance(markerData) {
+        var nearLat = document.getElementById('lat').value;
+        var nearLong = document.getElementById('long').value;
+
+        var distance = Math.sqrt(Math.pow((markerData["lat"] - nearLat),2) +
+                                 Math.pow((markerData["long"] - nearLong),2));
+        
+        // add the distance calculation to the array
+        distanceArray.push(distance);
+    }
+       
+    function addToCart() {
+        
+        amount += +document.getElementById('Recipe_selector').value;
+        amount = Math.round(amount * 10) / 10;
+        
+        // put it into the cart field
+        document.getElementById('cart_weight').value = amount;
+    }
+        
+    function emptyCart() {
+        
+        amount = +[];
+        
+        // put it into the cart field
+        document.getElementById('cart_weight').value = amount;
+    }
+        
+    </script>
+    
+</head>
+    
+<body onload="initialize()">  
+    <center>
+    <div id="wrapper">  
+    <p></p>  <p></p>  
+    <h2>How Would You Like Your Groceries Delivered?</h2>
+        
+    <div id="Recipe_selectorDiv"><label for="Recipe_selector"><strong>Select a Recipe: </strong></label>
+        <select id="Recipe_selector" name="Recipe_selector" onChange="filterRecipe(this.value)">
+<!--            <option value="--" selected>Demo</option>-->
+            <option value="2">Avocado Quinoa</option>
+            <option value="3.2">Baby Back Ribs</option>
+            <option value="10">Cookies</option>
+            <option value="5">Manicotti</option>
+            <option value="2.6">Tilapia</option>
+            <option value="15">Turkey</option>
+            <option value="4.2">Veggie Pasta</option>
+        </select>
+    </div>
+        
+    <div id="AddCartDiv" >
+        <a onClick="addToCart()">Add to Cart!</a>
+    </div>  
+        
+    <div id="EmptyCartDiv" >
+        <a onClick="emptyCart()">Empty Cart</a>
+    </div>  
+        
+    <div id="Refresh" >
+        <a onClick="history.go(0)">Refresh Page</a>
+    </div>
+        
+    <div id="logo">
+        Inspiration from: <br />
+        <img src="images/RelayFoods.png" height="82px" width="200px"/> <br />
+        Created by: Leslie Tanner
+    </div>    
+    
+    <div id="CartDiv">
+        <table border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>Weight in Cart: </td>
+                <td><input class="calculated_weight" type="text" size="2" name="cart_weight" id="cart_weight" /></td>
+                <td><img src="images/cart-76-32.png" /></td>
+            </tr>
+        </table>    
+    </div>     
+    
+    <div id="AddressBar">
+        <form action="#" onsubmit="getLatLng(this.address.value, showAddress); return false">
+        <table>    
+            <tr>
+                <td>Enter delivery address.</td>
+            </tr>
+            <tr>
+            <td><input type="text" style="width:350px" name="address" value="8 East Range Charlottesville VA 22903" /></td>
+            </tr>
+            <tr>
+            <td><input id="submit" type="submit" value="Click here to see theoretical ranges based on weight carried!" /></td>
+            </tr>
+            <tr>
+                <td>Nearest Site: </td>
+            </tr>
+            <tr>    
+                <td><input class="calculated" type="text" style="width:350px;" name="nearest" id="nearest" /></td>
+            </tr> 
+            <tr>
+                <td style="visibility: hidden;">Latitude: <input type="text" size="25" name="lat" id="lat"/></td>
+            </tr>
+            <tr>
+                <td style="visibility: hidden;">Longitude: <input type="text" size="25" name="long" id="long" />
+            </tr>   
+        </table>
+        </form>
+    </div>
+        
+    <div id="result">
+        <table border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td colspan="8">To actually succeed at such distance, this would take: </td>
+            </tr>
+            <tr>
+                <td><input class="response" type="text" name="quad_total" id="quad_total" /></td>
+                <td><img src="images/drone.svg" height="100px" width="100px" /></td>
+                <td><input class="response" type="text" name="drone_total" id="drone_total" /></td>
+                <td><img src="images/drone2.svg" style="fill: #2C2C2C;" height="100px" width="100px" /></td>
+                <td><input class="response" type="text" name="bird_total" id="bird_total" /></td>
+                <td><img src="images/dove-races.svg" height="90px" width="90px" /></td>
+                <td><input class="response" type="text" name="paper_total" id="paper_total" /></td>
+                <td><img src="images/paper-plane.svg" height="90px" width="90px" /></td>
+            </tr>
+            <tr>
+                <td colspan="5"></td>
+                <td colspan="3" style="text-align: left; color: #549DC2;">It could grip it by the husk!</td> 
+            </tr>
+        </table> 
+    </div>
+    
+    <div id="credit"><strong>Credit: </strong>Drone by Blaise Sewell from the Noun Project<br />
+        Some Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+    </div>    
+
+    <div id="RecipeMapDemo"></div>
+    <iframe id="RecipeText" src="Recipes/AvocadoQuinoa.html"></iframe>
+    
+</div>
+</center>
+</body>
+</html>
